@@ -11,105 +11,6 @@ app.use(cors());
 // In-memory cache store
 const cache = {};
 
-/**
- * Custom caching middleware with intentional vulnerabilities
- * VULNERABILITY: This middleware doesn't include critical headers in the cache key
- */
-// const vulnerableCacheMiddleware = (req, res, next) => {
-//   const cacheKey = `${req.path}:${req.query.fromToken}-${req.query.toToken}`;
-  
-//   if (cache[cacheKey]) {
-//     console.log(`Cache HIT: ${cacheKey}`);
-//     if (cache[cacheKey].status && cache[cacheKey].body) {
-//       return res.status(cache[cacheKey].status).json(cache[cacheKey].body);
-//     }
-//     delete cache[cacheKey];
-//   }
-
-//   const originalSend = res.send;
-//   const originalStatus = res.status;
-  
-//   res.status = function(code) {
-//     res.statusCode = code;
-//     return this;
-//   };
-
-//   res.send = body => {
-//     // Handle existing JSON strings properly
-//     let jsonBody;
-//     try {
-//       // Check if body is already valid JSON
-//       jsonBody = typeof body === 'string' 
-//         ? JSON.parse(body) 
-//         : body;
-//     } catch (e) {
-//       // If not JSON, wrap in message object
-//       jsonBody = { message: body };
-//     }
-
-//     // Ensure we don't store circular structures
-//     const cleanBody = JSON.parse(JSON.stringify(jsonBody));
-    
- 
-
-//     cache[cacheKey] = {
-//       status: res.statusCode,
-//       body: cleanBody
-//     };
-    
-//     res.set('Content-Type', 'application/json');
-//     originalStatus.call(res, res.statusCode);
-
-    
-//     originalSend.call(res, cleanBody); // Send cleaned body
-//   };
-
-//   console.log(`Cache MISS: ${cacheKey}`);
-//   next();
-// };
-
-// Token price data
-
-// Update the vulnerableCacheMiddleware
-// const vulnerableCacheMiddleware = (req, res, next) => {
-//     const cacheKey = `${req.path}:${req.query.fromToken}-${req.query.toToken}`;
-    
-//     if (cache[cacheKey]) {
-//       if (cache[cacheKey].status && cache[cacheKey].body) {
-//         // Use original response methods directly
-//         return res
-//           .status(cache[cacheKey].status)
-//           .set('Content-Type', 'application/json')
-//           .json(cache[cacheKey].body);
-//       }
-//       delete cache[cacheKey];
-//     }
-  
-//     const originalSend = res.send.bind(res);
-    
-//     res.send = function(body) {
-//       // Re-entrancy guard
-//       if (this.__sendCalled) return;
-//       this.__sendCalled = true;
-  
-//       // Only cache successful responses
-//       if (this.statusCode >= 200 && this.statusCode < 300) {
-//         try {
-//           cache[cacheKey] = {
-//             status: this.statusCode,
-//             body: JSON.parse(JSON.stringify(body)) // Safe clone
-//           };
-//         } catch (e) {
-//           console.error('Failed to cache response:', e);
-//         }
-//       }
-      
-//       // Send response directly without middleware processing
-//       originalSend(body);
-//     };
-  
-//     next();
-//   };
 
 
 // Update the vulnerableCacheMiddleware
@@ -315,7 +216,7 @@ app.use((req, res, next) => {
 // Serve static files from public directory
 app.use(express.static('public'));
 
-// VULNERABILITY: Cache poisoning to make a static image disappear
+// VULNERABILITY: Cache poisoning to make a static image disappear , NOT FULLY IMLEMENTED
 app.get('/api/logo', vulnerableCacheMiddleware, (req, res) => {
   // VULNERABILITY: This header affects whether the image is returned but isn't in the cache key
   const imageVariant = req.headers['x-image-variant'] || 'default';

